@@ -100,8 +100,8 @@ class Magma:
         maybe_magma = self.buffers.get(self.nvim.current.buffer.number)
         if requires_instance and maybe_magma is None:
             self.command_init([])
-            magma = self.buffers.get(self.nvim.current.buffer.number)
-            assert magma is not None
+            while (magma := self.buffers.get(self.nvim.current.buffer.number)) is None:
+                pass
             return magma
         return maybe_magma
 
