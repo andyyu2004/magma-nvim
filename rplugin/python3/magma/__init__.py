@@ -99,10 +99,10 @@ class Magma:
     def _get_magma(self, requires_instance: bool) -> Optional[MagmaBuffer]:
         maybe_magma = self.buffers.get(self.nvim.current.buffer.number)
         if requires_instance and maybe_magma is None:
-            raise MagmaException(
-                "Magma is not initialized; run `:MagmaInit <kernel_name>` to \
-                initialize."
-            )
+            self.command_init([])
+            magma = self.buffers.get(self.nvim.current.buffer.number)
+            assert magma is not None
+            return magma
         return maybe_magma
 
     def _clear_interface(self) -> None:
