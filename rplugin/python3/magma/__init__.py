@@ -100,9 +100,7 @@ class Magma:
         maybe_magma = self.buffers.get(self.nvim.current.buffer.number)
         if requires_instance and maybe_magma is None:
             self.command_init([])
-            while (magma := self.buffers.get(self.nvim.current.buffer.number)) is None:
-                pass
-            return magma
+            return self.buffers.get(self.nvim.current.buffer.number)
         return maybe_magma
 
     def _clear_interface(self) -> None:
