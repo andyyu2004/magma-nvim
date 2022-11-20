@@ -99,8 +99,7 @@ class Magma:
     def _get_magma(self, requires_instance: bool) -> Optional[MagmaBuffer]:
         maybe_magma = self.buffers.get(self.nvim.current.buffer.number)
         if requires_instance and maybe_magma is None:
-            self.command_init([])
-            return self.buffers.get(self.nvim.current.buffer.number)
+            return self.command_init([])
         return maybe_magma
 
     def _clear_interface(self) -> None:
@@ -152,40 +151,21 @@ class Magma:
 
     @pynvim.command("MagmaInit", nargs="?", sync=True)  # type: ignore
     @nvimui  # type: ignore
-    def command_init(self, args: List[str]) -> None:
+    def command_init(self, args: List[str]) -> Optional[MagmaBuffer]:
         self._initialize_if_necessary()
 
         if args:
             kernel_name = args[0]
-            self._initialize_buffer(kernel_name)
+            return self._initialize_buffer(kernel_name)
         else:
             PROMPT = "Select the kernel to launch:"
             available_kernels = get_available_kernels()
-            if self.nvim.exec_lua("return vim.ui.select ~= nil"):
-                self.nvim.exec_lua(
-                    """
-                        vim.ui.select(
-                            {%s},
-                            {prompt = "%s"},
-                            function(choice)
-                                if choice ~= nil then
-                                    vim.cmd("MagmaInit " .. choice)
-                                end
-                            end
-                        )
-                    """
-                    % (
-                        ", ".join(repr(x) for x in available_kernels),
-                        PROMPT,
-                    )
-                )
-            else:
-                kernel_name = self._ask_for_choice(
-                    PROMPT,
-                    available_kernels,  # type: ignore
-                )
-                if kernel_name is not None:
-                    self.command_init([kernel_name])
+            kernel_name = self._ask_for_choice(
+                PROMPT,
+                available_kernels,  # type: ignore
+            )
+            if kernel_name is not None:
+                return self.command_init([kernel_name])
 
     def _deinit_buffer(self, magma: MagmaBuffer) -> None:
         magma.deinit()
