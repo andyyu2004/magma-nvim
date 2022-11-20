@@ -166,6 +166,8 @@ class Magma:
             )
             if kernel_name is not None:
                 return self.command_init([kernel_name])
+            else:
+                raise MagmaException("No kernel selected")
 
     def _deinit_buffer(self, magma: MagmaBuffer) -> None:
         magma.deinit()
